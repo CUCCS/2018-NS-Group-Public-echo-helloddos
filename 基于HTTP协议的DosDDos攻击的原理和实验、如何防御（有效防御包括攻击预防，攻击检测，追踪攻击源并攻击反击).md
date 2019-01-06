@@ -36,12 +36,13 @@
 
 
        对于攻击前的预防，可以从提高服务器性能方面入手，如完善网络协议、应用代码做好性能优化、网络架构做好优化。
-
+    
      - 攻击产生时的检测过滤
 
 
 
        针对不同攻击的在流量速率连接请求数量等区别于正常流量的特征，对攻击进行检测。可以利用特征匹配的方法对攻击进行检测，首先建立一个已知特征数据库，根据检测到的流量是否符合该数据库的特征参数，来判断有无攻击产生。
+
 
    	
 
@@ -186,7 +187,7 @@
 
           在攻击进行到第4s的时候，此时attacker对应的ip已经`达到了单个ip能建立的最多连接数10`，服务器拒绝attacker继续连接，缓解了slowloris攻击。
 
-          ![img11](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/Dos/img/11.jpg)
+          ![img11](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/11.jpg)
 
       - 使用`iptables`限制单个ip允许的tcp连接个数。
 
@@ -198,11 +199,11 @@
 
         ​       配置完成后查看iptables，如下,可见`iptables`中多了一条规则，单个ip的tcp连接最多20个。
 
-        ​	![12](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/Dos/img/12.PNG)
+        ​	![12](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/12.PNG)
 
         -  配置完成后，在attacker使用`slowhttptest -c 500 -H -g -o outputfile -i 10 -r 200 -t GET -u http://169.254.227.183/ -x 24 -p 2` 对victim进行与之前`完全相同`的攻击。 slowhttptest 的输出结果如下,当attacker和victim的连接数达到20个以后，iptables作用规则生效，attacker`无法继续和victim建立连接`，占用victim`连接资源`。
 
-          ![13](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/Dos/img/13.PNG)
+          ![13](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/13.PNG)
 
       - 检测攻击源并阻止对应ip继续访问
 
@@ -399,9 +400,9 @@
 
 
       ![img17](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/17.jpg)
-
+    
       - 在单主机攻击方中，攻击者`利用一台主机虚构出多个ip地址`向应用服务器发送请求包，当服务器来不及处理这访问请求时，将导致该页面不能响应正常用户的访问请求。
-
+    
        -  利用代理服务器进行攻击时，攻击者通过攻击主机发送页面访问请求给代理服务器，然后攻击主机可以`立刻断开与代理服务器的本次连接，并马上发送下一次的访问请求`，由于代理服务器接受请求后一定会对服务器的制定页面资源进行访问，所以攻击者主机不必像直接访问服务器那样`维持访问的连接`，因此采用这种方式，`攻击效率会大大提升`。
        -  利用僵尸网络进行攻击时，攻击者通过攻击主机发送指令到僵尸网络，由僵尸网络主机自动发送请求给服务器，当使用一定规模的僵尸网络进行CC攻击时，将会对应用服务器造成巨大的负担，导致服务器瘫痪。同时由于这些攻击流量采用的是`真实`、`不同的ip`，`高度模拟`了 正常用户的访问，因此具有很强的`隐蔽性`。
 
@@ -457,24 +458,25 @@
            			 # Close our socket gracefully
         			dos.shutdown(socket.SHUT_RDWR)
         			dos.close()
-      	```
       ```
-
+      ```
+      
       - 运行 `python pyflooder.py 169.254.227.183 80  10`语句对victim进行攻击(首先对victi发送10个http请求），发送的攻击包如下:
         ​		![19](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/19.PNG)
+      ```
 
 
 
       - 在`victim`中查看`apache access.log `可发现`攻击`的数据包`请求成功`，见下图：
-        ![img21](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/Dos/img/21.PNG)
-
+        ![img21](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/21.PNG)
+    
       - 运行 `python pyflooder.py 169.254.227.183 80  1000`	对`victim`发送`1000次`http [rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)页面请求攻击,发现victim卡死，victim中的apache服务对其他的页面请求`无响应`，拒绝服务攻击完成。
         ​	![img23](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/23.jpg)
-
+    
       - 使用代理服务器群进行CC攻击。
-
+    
         #todo		
-
+    
         首先`victim`配置虚拟机桥接网卡，因为代理ip是真实ip，需要给虚拟机配置一个外界真实ip能访问到的ip.
         ​	搜集可用代理服务器（网上一抓一大把）
         ​	使用[CC-attack](https://github.com/Leeon123/CC-attack)攻击工具对victim进行攻击，不断地访问[rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)。
