@@ -459,28 +459,25 @@
         			dos.shutdown(socket.SHUT_RDWR)
         			dos.close()
       ```
-      ```
-      
       - 运行 `python pyflooder.py 169.254.227.183 80  10`语句对victim进行攻击(首先对victi发送10个http请求），发送的攻击包如下:
-        ​		![19](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/19.PNG)
-      ```
-
-
+          ![19](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/19.PNG)
 
       - 在`victim`中查看`apache access.log `可发现`攻击`的数据包`请求成功`，见下图：
-        ![img21](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/21.PNG)
-    
+          ![img21](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/21.PNG)
+
       - 运行 `python pyflooder.py 169.254.227.183 80  1000`	对`victim`发送`1000次`http [rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)页面请求攻击,发现victim卡死，victim中的apache服务对其他的页面请求`无响应`，拒绝服务攻击完成。
-        ​	![img23](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/23.jpg)
-    
+
+          ![img23](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/23.jpg)
+
       - 使用代理服务器群进行CC攻击。
-    
-        #todo		
-    
-        首先`victim`配置虚拟机桥接网卡，因为代理ip是真实ip，需要给虚拟机配置一个外界真实ip能访问到的ip.
-        ​	搜集可用代理服务器（网上一抓一大把）
-        ​	使用[CC-attack](https://github.com/Leeon123/CC-attack)攻击工具对victim进行攻击，不断地访问[rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)。
-        ​	
+
+          #todo		
+
+          首先`victim`配置虚拟机桥接网卡，因为代理ip是真实ip，需要给虚拟机配置一个外界真实ip能访问到的ip.
+          ​	搜集可用代理服务器（网上一抓一大把）
+          ​	使用[CC-attack](https://github.com/Leeon123/CC-attack)攻击工具对victim进行攻击，不断地访问[rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)。
+
+          ​	
 
   - CC攻击防御和检测
     - 限制请求频率
