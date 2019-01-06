@@ -8,6 +8,7 @@
 
     Dos攻击的目的是通过耗尽cpu 内存和网络带宽等服务器资源的方法，致使服务器无法为用户提供正常服务或使得服务质量下降。
     DDos（Distributed Denail of Service）攻击又称为分布式拒绝服务攻击，是在Dos攻击基础上进行发展改进的，比Dos攻击危害更大。攻击者首先根据采集到的信息，占领大量的僵尸主机，之后通过数量众多、分布各异的僵尸主机向目标服务器发送攻击数据包，迅速消耗网络和系统资源以达到拒绝服务的攻击效果。
+
     但不管是Dos还是DDos攻击，其原理都一致，消耗某一种资源使正常服务无法保持。
 
   - 攻击手段
@@ -28,25 +29,30 @@
 
    - 防御手段
 
-   	根据防御时间点的不同，防御手段可分为两大类：
+     根据防御时间点的不同，防御手段可分为两大类：
 
-   	-  攻击前的预防方法
+     - 攻击前的预防方法
 
-   		对于攻击前的预防，可以从提高服务器性能方面入手，如完善网络协议、应用代码做好性能优化、网络架构做好优化。
-   	 
-   	- 攻击产生时的检测过滤
 
-   		针对不同攻击的在流量速率连接请求数量等区别于正常流量的特征，对攻击进行检测。可以利用特征匹配的方法对攻击进行检测，首先建立一个已知特征数据库，根据检测到的流量是否符合该数据库的特征参数，来判断有无攻击产生。
+
+       对于攻击前的预防，可以从提高服务器性能方面入手，如完善网络协议、应用代码做好性能优化、网络架构做好优化。
+
+     - 攻击产生时的检测过滤
+
+
+
+       针对不同攻击的在流量速率连接请求数量等区别于正常流量的特征，对攻击进行检测。可以利用特征匹配的方法对攻击进行检测，首先建立一个已知特征数据库，根据检测到的流量是否符合该数据库的特征参数，来判断有无攻击产生。
+
    	
 
 - [ ] 基于HTTP协议的Dos/DDos攻击种类
-	
-	 - Slowloris
-	 - HTTP POST DOS(RUDY)
-	 - Server Limit DOS
-	 - CC攻击
-	
-	 
+
+   - Slowloris
+    - HTTP POST DOS(RUDY)
+    - Server Limit DOS
+    - CC攻击
+
+    
 
 
 - [ ] Slowloris 原理、攻击实验及对应防御措施
@@ -364,149 +370,155 @@
 		sudo ps -efl | grep apache2 
 		```
 		- 在攻击期间从主机访问靶机加载非常慢，而且两台虚拟机都反应迟钝，感受到攻击的效果。
-  ​				
+  		​				
 
 
 - Server Limit DOS
 
-	- 原理
-		
-		
-		web server 对HTTP包头都有长度限制(如apache2服务器中的LimitRequestFieldSize和nginx中的large\_client\_header\_buffers属性，都能限制Http header的长度）,如果客户端发送的http包头超过这个大小，服务器就会返回一个4xx错误。
-		假如攻击者通过XSS攻击，恶意往客户端写入一个超长的cookie，则该客户端在该cookie失效之前，将再无法访问该cookie所在域的任何页面。因为cookie放在http header中发送，如果cookie过长，导致http header过长，服务器拒绝该用户的请求，导致拒绝服务攻击。
+  - 原理
+  	
+  	
+  	web server 对HTTP包头都有长度限制(如apache2服务器中的LimitRequestFieldSize和nginx中的large\_client\_header\_buffers属性，都能限制Http header的长度）,如果客户端发送的http包头超过这个大小，服务器就会返回一个4xx错误。
+  	假如攻击者通过XSS攻击，恶意往客户端写入一个超长的cookie，则该客户端在该cookie失效之前，将再无法访问该cookie所在域的任何页面。因为cookie放在http header中发送，如果cookie过长，导致http header过长，服务器拒绝该用户的请求，导致拒绝服务攻击。
 
-	 - 防御
-	
-	 	可以调整通过调整服务器的参数配置，解除对http header的长度限制。
+   - 防御
 
-	
+   	可以调整通过调整服务器的参数配置，解除对http header的长度限制。
+
 - [ ] CC攻击原理、攻击实验及对应防御措施
 
-	- CC 攻击原理
-	
-	  对资源消耗较大的页面不断地发起正常的请求，以达到消耗服务端资源的目的。在web服务器中，查询数据库，读写硬盘文件，相对消耗比较多的资源。
+  - CC 攻击原理
 
-	  - 攻击方式
-	
-	    CC攻击方式主要有`三种`，`单主机虚拟多ip地址攻击`，`利用代理服务器群攻击`、`利用僵尸网络攻击`。
-	    利用代理服务器群或僵尸网络进行攻击的CC模型如下图。
-	    ![img17](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/17.jpg)
-	
-	    - 在单主机攻击方中，攻击者`利用一台主机虚构出多个ip地址`向应用服务器发送请求包，当服务器来不及处理这访问请求时，将导致该页面不能响应正常用户的访问请求。
-	
-	     -  利用代理服务器进行攻击时，攻击者通过攻击主机发送页面访问请求给代理服务器，然后攻击主机可以`立刻断开与代理服务器的本次连接，并马上发送下一次的访问请求`，由于代理服务器接受请求后一定会对服务器的制定页面资源进行访问，所以攻击者主机不必像直接访问服务器那样`维持访问的连接`，因此采用这种方式，`攻击效率会大大提升`。
-	     -  利用僵尸网络进行攻击时，攻击者通过攻击主机发送指令到僵尸网络，由僵尸网络主机自动发送请求给服务器，当使用一定规模的僵尸网络进行CC攻击时，将会对应用服务器造成巨大的负担，导致服务器瘫痪。同时由于这些攻击流量采用的是`真实`、`不同的ip`，`高度模拟`了 正常用户的访问，因此具有很强的`隐蔽性`。
-	
+    对资源消耗较大的页面不断地发起正常的请求，以达到消耗服务端资源的目的。在web服务器中，查询数据库，读写硬盘文件，相对消耗比较多的资源。
+
+    - 攻击方式
+
+      CC攻击方式主要有`三种`，`单主机虚拟多ip地址攻击`，`利用代理服务器群攻击`、`利用僵尸网络攻击`。
+      利用代理服务器群或僵尸网络进行攻击的CC模型如下图。
+
+
+
+      ![img17](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/17.jpg)
+
+      - 在单主机攻击方中，攻击者`利用一台主机虚构出多个ip地址`向应用服务器发送请求包，当服务器来不及处理这访问请求时，将导致该页面不能响应正常用户的访问请求。
+
+       -  利用代理服务器进行攻击时，攻击者通过攻击主机发送页面访问请求给代理服务器，然后攻击主机可以`立刻断开与代理服务器的本次连接，并马上发送下一次的访问请求`，由于代理服务器接受请求后一定会对服务器的制定页面资源进行访问，所以攻击者主机不必像直接访问服务器那样`维持访问的连接`，因此采用这种方式，`攻击效率会大大提升`。
+       -  利用僵尸网络进行攻击时，攻击者通过攻击主机发送指令到僵尸网络，由僵尸网络主机自动发送请求给服务器，当使用一定规模的僵尸网络进行CC攻击时，将会对应用服务器造成巨大的负担，导致服务器瘫痪。同时由于这些攻击流量采用的是`真实`、`不同的ip`，`高度模拟`了 正常用户的访问，因此具有很强的`隐蔽性`。
+
   - CC攻击特征
-	  	 CC攻击具有`低流量`、`模拟用户正常访问`和`采用真实ip地址`进行访问的特征。
-	  	
-	  	- 首先，与流量型DDos攻击不同，CC攻击针对网站服务器性能弱点，所以可能仅需很小的流量就能达到攻击的效果。
-	  	- 其次不同于基于TCP半开连接或者SYNFlood的攻击，CC攻击是一个正常的请求，具有正常访问的特征，因此很难与正常访问进行区别。
-	  	- 最后，CC攻击一般会利用代理服务器进行攻击，这样攻击来源于不同的真实ip，很难根据用户的ip区分是正常访问还是攻击。
-	  	
-	
-	- CC攻击实验
-		
-		- 首先在victim中的mysql服务器中导入了一个数据库，选用了[Employees Sample Database](https://dev.mysql.com/doc/employee/en/)
-		 导入完成后，查看employees数据库中employees数据表中的记录条数为`300024`，如下：
-		
-		 ![img18](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/18.PNG)
-	
-	- 然后在apache的服务器中增加一个对数据库访问的php页面 [rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py),功能为：每次产生两个随机字符串，并对employees数据表进行查询。
-		
-			其中sql检索语句为`$sql = "select * from employees where first_name = '".$a."' and last_name ='".$b."' order by birth_date desc limit 30";`
-		
-			之所以使用随机字符串是因为观察案发现mysql数据库有类似于缓存的功能。同样的语句`第一次执行`和`第二次执行`使用时间不同，如下图。为了达到较好的攻击效果，采取每次查询均使用随机字符串的方法。
-			![23](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/23.PNG)
-	
+      CC攻击具有`低流量`、`模拟用户正常访问`和`采用真实ip地址`进行访问的特征。
 
-	
-	-  使用单ip进行CC攻击（以apache服务器为例）
-		
-			在`attacker`中采用 [HTTP FLOOD](https://github.com/D4Vinci/PyFlooder)的攻击方法（对源码进行[修改](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)以访问指定页面），不断对victim的[rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)页面进行访问。对应函数为：
-			
-			```
-			def attack():
-	 				print_status()
-   		   		url_path = generate_url_path()
-	
-	    	# Create a raw socket
-	 		 		  dos = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	
-		 	 	try:
-    	   			 # Open the connection on that raw socket
-     	   			dos.connect((ip, port))
-  ​		
-		      			# Send the request according to HTTP spec
-    	   			 dos.send("GET /rand.php HTTP/1.1\r\nHost: 169.254.227.182\r\nUser-Agent: curl/7.61.0\r\nAccept: */*\r\n\r\n")   
-    	   			 
-   				except socket.error, e:
-   	       			print "\n [ No connection, server may be down ]: " + str(e)
-	 	       			
-				  	finally:
-  	     			 # Close our socket gracefully
-  	  			dos.shutdown(socket.SHUT_RDWR)
-  	  			dos.close()
-  		```
-	
-	
-	​		
-			运行 `python pyflooder.py 169.254.227.183 80  10`语句对victim进行攻击(首先对victi发送10个http请求），发送的攻击包如下:
-			![19](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/19.PNG)
-			
-			在`victim`中查看`apache access.log `可发现`攻击`的数据包`请求成功`，见下图：
-			![img21](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/Dos/img/21.PNG)
-	
-			运行 `python pyflooder.py 169.254.227.183 80  1000`	对`victim`发送`1000次`http [rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)页面请求攻击,发现victim卡死，victim中的apache服务对其他的页面请求`无响应`，拒绝服务攻击完成。
-			![img23](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/23.jpg)
-		-  使用代理服务器群进行CC攻击。
-			
-			首先`victim`配置虚拟机桥接网卡，因为代理ip是真实ip，需要给虚拟机配置一个外界真实ip能访问到的ip.
-			搜集可用代理服务器（网上一抓一大把）
-			使用[CC-attack](https://github.com/Leeon123/CC-attack)攻击工具对victim进行攻击，不断地访问[rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)。
-	
-	
-	​	
-	​	
-	- CC攻击防御和检测
-	  - 限制请求频率
-	  	
-	  	在应用中为限制每个客户端的请求频率，这种方法对于单ip攻击比较有效，对于代理ip和僵尸网络可能作用不是很大。
-	  	对于apache2 可采用 `mod_qos`模块。（已在Slowloris中 演示开启方法)
-	  	对于nginx，可使用如下模块
-	  	- nginx模块：ngx_http_limit_req_module 限制每秒请求数
-	  	- nginx模块：ngx_http_limit_conn_module 限制IP连接数
-	
-	  - 基于网站代码优化的检测方法
-	  	
-	  	- 应用代码做好`性能优化`
-	  		
-	  		合理使用缓存，将数据库压力尽可能转移到内存中。
-	  		提高代码性能
-	  		​	
-	  		
-	  	- 采用`cookie认证`主动检测CC攻击
-	  		
-	  		采用cookie认证检测CC攻击的原理是，当用户第一次访问某个页面时，在用户的浏览器设置一个cookie值，在随后访问的一段时间内，用户再次访问相同的URL时，必须携带相同的cookie。
-	  		如果对于服务器的访问是由cookie自动发起的，则在第一次访问完成后的攻击，攻击者很可能不会携带该cookie，服务器可判定此类数据包为攻击数据包。
-	  		但是如果攻击者分析网站检测CC攻击的方法，并增加保留cookie的功能，该方法将失效。
-	  	- 通过HTTP_X_FORWARD_FOR变量检测。
-	  		
-	  		`代理服务器`在提供代理服务时会通过HTTP中的HTTP_X_FORWARD_FOR变量发送原始用户ip地址，可以根据这个变量`统计原ip的访问频率`，用于判断该ip是否对服务器进行CC攻击，但是这种方法，不适用于僵尸网络。
-	
-	  - 	基于运营商网络的CC攻击检测方法
-	  	
-	  	基于运营商的检测方法，主要依赖于对访问网站的数据流分析。基于正常网络数据流了，可以统计session特点，生成网站不同URL访问量分布模型，如果某段时间的session或网站URL访问和模型差值超过`阈值`，可判定网站正在遭受CC攻击。
-	  	
-	  	
-	  	​		
-	
-	  - 网络架构做好优化
-	  	​	
-	  	善用利用`负载均衡分流`，避免单台服务器承受较大流量，充分利用CDN和镜像站点的分流作用。	
-	  					  
+      - 首先，与流量型DDos攻击不同，CC攻击针对网站服务器性能弱点，所以可能仅需很小的流量就能达到攻击的效果。
+
+      - 其次不同于基于TCP半开连接或者SYNFlood的攻击，CC攻击是一个正常的请求，具有正常访问的特征，因此很难与正常访问进行区别。
+
+      - 最后，CC攻击一般会利用代理服务器进行攻击，这样攻击来源于不同的真实ip，很难根据用户的ip区分是正常访问还是攻击。
+
+
+
+  - CC攻击实验
+
+    - 首先在victim中的mysql服务器中导入了一个数据库，选用了[Employees Sample Database](https://dev.mysql.com/doc/employee/en/)
+     导入完成后，查看employees数据库中employees数据表中的记录条数为`300024`，如下：
+
+     ![img18](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/18.PNG)
+
+  - 然后在apache的服务器中增加一个对数据库访问的php页面 [rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py),功能为：每次产生两个随机字符串，并对employees数据表进行查询。
+
+     其中sql检索语句为`$sql = "select * from employees where first_name = '".$a."' and last_name ='".$b."' order by birth_date desc limit 30";`
+
+
+
+     之所以使用随机字符串是因为观察案发现mysql数据库有类似于缓存的功能。同样的语句`第一次执行`和`第二次执行`使用时间不同，如下图。为了达到较好的攻击效果，采取每次查询均使用随机字符串的方法。
+     ![23](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/23.PNG)
+
+
+
+  - 使用单ip进行CC攻击（以apache服务器为例）
+
+      - 在`attacker`中采用 [HTTP FLOOD](https://github.com/D4Vinci/PyFlooder)的攻击方法（对源码进行[修改](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)以访问指定页面），不断对victim的[rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)页面进行访问。对应函数为：
+
+      ```
+      def attack():
+         print_status()
+         url_path = generate_url_path()
+      # Create a raw socket   
+      dos = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      
+       	  try:      
+       	 	        #Open the connection on that raw socket
+       	 			dos.connect((ip, port))  
+      	      		# Send the request according to HTTP spec
+        	   			 dos.send("GET /rand.php HTTP/1.1\r\nHost: 169.254.227.182\r\nUser-Agent: curl/7.61.0\r\nAccept: */*\r\n\r\n")   
+        	   			 
+       	  except socket.error, e:
+       	       	print "\n [ No connection, server may be down ]: " + str(e)
+       	  finally:
+           			 # Close our socket gracefully
+        			dos.shutdown(socket.SHUT_RDWR)
+        			dos.close()
+      	```
+      ```
+
+      - 运行 `python pyflooder.py 169.254.227.183 80  10`语句对victim进行攻击(首先对victi发送10个http请求），发送的攻击包如下:
+        ​		![19](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/19.PNG)
+
+
+
+      - 在`victim`中查看`apache access.log `可发现`攻击`的数据包`请求成功`，见下图：
+        ![img21](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/Dos/img/21.PNG)
+
+      - 运行 `python pyflooder.py 169.254.227.183 80  1000`	对`victim`发送`1000次`http [rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)页面请求攻击,发现victim卡死，victim中的apache服务对其他的页面请求`无响应`，拒绝服务攻击完成。
+        ​	![img23](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/raw/master/img/23.jpg)
+
+      - 使用代理服务器群进行CC攻击。
+
+        #todo		
+
+        首先`victim`配置虚拟机桥接网卡，因为代理ip是真实ip，需要给虚拟机配置一个外界真实ip能访问到的ip.
+        ​	搜集可用代理服务器（网上一抓一大把）
+        ​	使用[CC-attack](https://github.com/Leeon123/CC-attack)攻击工具对victim进行攻击，不断地访问[rand.php](https://github.com/CUCCS/2018-NS-Group-Public-echo-helloddos/blob/master/source_code/pyflooder.py)。
+        ​	
+
+  - CC攻击防御和检测
+    - 限制请求频率
+    	
+    	在应用中为限制每个客户端的请求频率，这种方法对于单ip攻击比较有效，对于代理ip和僵尸网络可能作用不是很大。
+    	对于apache2 可采用 `mod_qos`模块。（已在Slowloris中 演示开启方法)
+    	对于nginx，可使用如下模块
+    	- nginx模块：ngx_http_limit_req_module 限制每秒请求数
+    	- nginx模块：ngx_http_limit_conn_module 限制IP连接数
+
+    - 基于网站代码优化的检测方法
+    	
+    	- 应用代码做好`性能优化`
+    		
+    		合理使用缓存，将数据库压力尽可能转移到内存中。
+    		提高代码性能
+    		​	
+    		
+    	- 采用`cookie认证`主动检测CC攻击
+    		
+    		采用cookie认证检测CC攻击的原理是，当用户第一次访问某个页面时，在用户的浏览器设置一个cookie值，在随后访问的一段时间内，用户再次访问相同的URL时，必须携带相同的cookie。
+    		如果对于服务器的访问是由cookie自动发起的，则在第一次访问完成后的攻击，攻击者很可能不会携带该cookie，服务器可判定此类数据包为攻击数据包。
+    		但是如果攻击者分析网站检测CC攻击的方法，并增加保留cookie的功能，该方法将失效。
+    	- 通过HTTP_X_FORWARD_FOR变量检测。
+    		
+    		`代理服务器`在提供代理服务时会通过HTTP中的HTTP_X_FORWARD_FOR变量发送原始用户ip地址，可以根据这个变量`统计原ip的访问频率`，用于判断该ip是否对服务器进行CC攻击，但是这种方法，不适用于僵尸网络。
+
+    - 	基于运营商网络的CC攻击检测方法
+    	
+    	基于运营商的检测方法，主要依赖于对访问网站的数据流分析。基于正常网络数据流了，可以统计session特点，生成网站不同URL访问量分布模型，如果某段时间的session或网站URL访问和模型差值超过`阈值`，可判定网站正在遭受CC攻击。
+    	
+    	
+    	​		
+
+    - 网络架构做好优化
+    	​	
+    	善用利用`负载均衡分流`，避免单台服务器承受较大流量，充分利用CDN和镜像站点的分流作用。	
+    	​				  
 ### 其它工具简介 
-	
+
 - DDOSIM 【排雷】
 	
 	- 推荐的ddos工具中DDOSIM出现的频率很高，简单介绍一下：Storm Security的这个工具使用随机IP地址模拟来自各种僵尸的DDoS攻击。它尝试创建完整的TCP连接（SYN-SYN / ACK-ACK）。它的全名叫：DDOSIM - Layer 7 DDoS Simulator，顾名思义，它在应用层（第7层）运行。它还能够模拟SMTP服务器上的DDoS攻击和随机端口的TCP泛洪。
